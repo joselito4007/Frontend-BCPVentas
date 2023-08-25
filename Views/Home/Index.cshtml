@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bienvenido al portal de Ventas BCP</h1>
+</div>
+<div>
+    <h2><center>Ventas</center></h2>
+    <table class="table">
+        <tr>
+            <td><b>Id</b></td>
+            <td><b>Periodo</b></td>
+            <td><b>Nombre del Asesor</b></td>
+            <td><b>Nombre del Cliente</b></td>
+            <td><b>Nombre del Producto</b></td>
+            <td><b>Puntos</b></td>
+            <td><b>Fecha de Registro</b></td>
+            <td><b>Monto</b></td>
+        </tr>
+        @foreach(var ListaVentas in Model)
+        {
+         <tr>
+            <td>@ListaVentas.IdVenta</td>
+            <td>@ListaVentas.Periodo</td>
+            <td>@ListaVentas.NameAsesor</td>
+            <td>@ListaVentas.NameCliente</td>
+            <td>@ListaVentas.NameProducto</td>
+            <td>@ListaVentas.Puntos</td>
+            <td>@ListaVentas.Fecha</td>
+            <td>@ListaVentas.Monto</td>
+        </tr>
+        }
+    </table>
+</div>

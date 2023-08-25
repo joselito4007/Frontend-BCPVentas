@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    var items = (List<SelectListItem>)ViewBag.items;
+    int suma;
+    //@Html.DropDownListFor(x => x.IdAsesor, new SelectList(items,"Id","NombreRegion",Model.IdAsesor))
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bienvenido al portal de Ventas BCP</h1>
+</div>
+<div>
+    <h2><center>Buscar ventas por asesor</center></h2>
+
+    @if(items != null){
+    @using(Html.BeginForm())
+    {
+    <p>
+            @Html.DropDownList("IdAsesor",items,"Seleccionar",new{@class="form-control"})
+    <br>
+    <input type = "submit" value = "Buscar" class = "btn btn-primary btn-large"/>
+    </p>
+    }
+    }
+
+</div>
+<div>
+    <h2><center>Ventas por Asesor</center></h2>
+    <table class="table">
+        <tr>
+            <td><b>Id</b></td>
+            <td><b>Periodo</b></td>
+            <td><b>Nombre del Asesor</b></td>
+            <td><b>Nombre del Cliente</b></td>
+            <td><b>Nombre del Producto</b></td>
+            <td><b>Fecha de Registro</b></td>
+            <td><b>Monto</b></td>
+            <td><b>Puntos</b></td>
+        </tr>
+        @{
+         int TotalSuma = 0;
+         if (Model != null)
+        {
+        @foreach(var ListaVentas in Model)
+        {
+         <tr>
+            <td>@ListaVentas.IdVenta</td>
+            <td>@ListaVentas.Periodo</td>
+            <td>@ListaVentas.NameAsesor</td>
+            <td>@ListaVentas.NameCliente</td>
+            <td>@ListaVentas.NameProducto</td>
+            <td>@ListaVentas.Fecha</td>
+            <td>@ListaVentas.Monto</td>
+            <td>@ListaVentas.Puntos</td>
+        </tr>
+          TotalSuma = TotalSuma + ListaVentas.Puntos;
+        }
+        <tr><td colspan="7"><b>Puntos Totales</b></td><td>@TotalSuma</td></tr>
+       }
+      }
+    </table>
+</div>
