@@ -1,12 +1,19 @@
-﻿using Frontend_BCPVentas.Models;
+﻿using Frontend_BCPVentas.Authorization;
+using Frontend_BCPVentas.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
+using RestSharp.Authenticators;
+using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Xml.Linq;
+using static System.Net.WebRequestMethods;
 
 namespace Frontend_BCPVentas.Controllers
 {
@@ -23,14 +30,34 @@ namespace Frontend_BCPVentas.Controllers
         public List<Asesor> Asesor = new List<Asesor>();
         public List<Client> Clientes = new List<Client>();
         public List<Producto> Producto = new List<Producto>();
+        public Login login = new Login();
 
         public IActionResult Index()
         {
-            RestClient Client = new RestClient("https://localhost:7094/api/Venta");
             string Respuesta;
 
-            RestRequest request = new RestRequest();
-            var response = Client.Get(request);
+            string UrlApi = "https://localhost:7094/api/";
+
+            var options = new RestClientOptions()
+            {
+                Authenticator = new ApiAuthorization(UrlApi, new Login()
+                {
+                    Email = "carlitos.4007@gmail.com",
+                    Pwd = "123456"
+
+                })
+            };
+
+            var Client = new RestClient(options);
+
+            var request = new RestRequest()
+            {
+                Resource = UrlApi + "Venta",
+                Method = Method.Get
+            };
+
+            //RestRequest request = new RestRequest("Venta");
+            var response = Client.Execute(request);
 
             Respuesta = response.Content;
 
@@ -43,11 +70,33 @@ namespace Frontend_BCPVentas.Controllers
 
         public IActionResult Nuevo()
         {
-            RestClient Client = new RestClient("https://localhost:7094/api/Asesor");
-            string Respuesta;
+            //Combos
 
-            RestRequest request = new RestRequest();
-            var response = Client.Get(request);
+            string Respuesta;
+            string Respuesta2;
+            string Respuesta3;
+
+            string UrlApi = "https://localhost:7094/api/";
+
+            var options = new RestClientOptions()
+            {
+                Authenticator = new ApiAuthorization(UrlApi, new Login()
+                {
+                    Email = "carlitos.4007@gmail.com",
+                    Pwd = "123456"
+
+                })
+            };
+
+            var Client = new RestClient(options);
+
+            var request = new RestRequest()
+            {
+                Resource = UrlApi + "Asesor",
+                Method = Method.Get
+            };
+
+            var response = Client.Execute(request);
 
             Respuesta = response.Content;
 
@@ -64,11 +113,15 @@ namespace Frontend_BCPVentas.Controllers
                 };
             });
 
-            RestClient Client2 = new RestClient("https://localhost:7094/api/Clients");
-            string Respuesta2;
+            var Client2 = new RestClient(options);
 
-            RestRequest request2 = new RestRequest();
-            var response2 = Client2.Get(request2);
+            var request2 = new RestRequest()
+            {
+                Resource = UrlApi + "Clients",
+                Method = Method.Get
+            };
+
+            var response2 = Client2.Execute(request2);
 
             Respuesta2 = response2.Content;
 
@@ -85,11 +138,15 @@ namespace Frontend_BCPVentas.Controllers
                 };
             });
 
-            RestClient Client3 = new RestClient("https://localhost:7094/api/Producto");
-            string Respuesta3;
+            var Client3 = new RestClient(options);
 
-            RestRequest request3 = new RestRequest();
-            var response3 = Client3.Get(request3);
+            var request3 = new RestRequest()
+            {
+                Resource = UrlApi + "Producto",
+                Method = Method.Get
+            };
+
+            var response3 = Client3.Execute(request3);
 
             Respuesta3 = response3.Content;
 
@@ -117,7 +174,23 @@ namespace Frontend_BCPVentas.Controllers
         public IActionResult Nuevo(string IdAsesor,string IdCliente, string IdProducto, string periodo, string monto)
         {
             dynamic respuesta;
+            string Respuesta;
+            string Respuesta2;
+            string Respuesta3;
+
             Ventas ventas = new Ventas();
+
+            string UrlApi = "https://localhost:7094/api/";
+
+            var options = new RestClientOptions()
+            {
+                Authenticator = new ApiAuthorization(UrlApi, new Login()
+                {
+                    Email = "carlitos.4007@gmail.com",
+                    Pwd = "123456"
+
+                })
+            };
 
             ventas.Periodo = Convert.ToDateTime(periodo);
             ventas.IdAsesor = Convert.ToInt32(IdAsesor);
@@ -126,17 +199,22 @@ namespace Frontend_BCPVentas.Controllers
             ventas.Fecha = DateTime.Now;
             ventas.Monto = Convert.ToDouble(monto);
 
-            RestClient Ventas = new RestClient();
-                string json = JsonConvert.SerializeObject(ventas);
-                respuesta = Ventas.PostJson("https://localhost:7094/api/Venta/", json);
+            var Ventas = new RestClient(options);
+
+            string json = JsonConvert.SerializeObject(ventas);
+            respuesta = Ventas.PostJson(UrlApi + "Venta", json);
 
             //Combos
 
-            RestClient Client = new RestClient("https://localhost:7094/api/Asesor");
-            string Respuesta;
+            var Client = new RestClient(options);
 
-            RestRequest request = new RestRequest();
-            var response = Client.Get(request);
+            var request = new RestRequest()
+            {
+                Resource = UrlApi + "Asesor",
+                Method = Method.Get
+            };
+
+            var response = Client.Execute(request);
 
             Respuesta = response.Content;
 
@@ -153,11 +231,15 @@ namespace Frontend_BCPVentas.Controllers
                 };
             });
 
-            RestClient Client2 = new RestClient("https://localhost:7094/api/Clients");
-            string Respuesta2;
+            var Client2 = new RestClient(options);
 
-            RestRequest request2 = new RestRequest();
-            var response2 = Client2.Get(request2);
+            var request2 = new RestRequest()
+            {
+                Resource = UrlApi + "Producto",
+                Method = Method.Get
+            };
+
+            var response2 = Client2.Execute(request2);
 
             Respuesta2 = response2.Content;
 
@@ -174,11 +256,15 @@ namespace Frontend_BCPVentas.Controllers
                 };
             });
 
-            RestClient Client3 = new RestClient("https://localhost:7094/api/Producto");
-            string Respuesta3;
+            var Client3 = new RestClient(options);
 
-            RestRequest request3 = new RestRequest();
-            var response3 = Client3.Get(request3);
+            var request3 = new RestRequest()
+            {
+                Resource = UrlApi + "Clients",
+                Method = Method.Get
+            };
+
+            var response3 = Client3.Execute(request3);
 
             Respuesta3 = response3.Content;
 
@@ -204,11 +290,29 @@ namespace Frontend_BCPVentas.Controllers
 
             public IActionResult BuscarVentas()
         {
-            RestClient Client = new RestClient("https://localhost:7094/api/Asesor");
+
+            string UrlApi = "https://localhost:7094/api/";
             string Respuesta;
 
-            RestRequest request = new RestRequest();
-            var response = Client.Get(request);
+            var options = new RestClientOptions()
+            {
+                Authenticator = new ApiAuthorization(UrlApi, new Login()
+                {
+                    Email = "carlitos.4007@gmail.com",
+                    Pwd = "123456"
+
+                })
+            };
+
+            var Client = new RestClient(options);
+
+            var request = new RestRequest()
+            {
+                Resource = UrlApi + "Asesor",
+                Method = Method.Get
+            };
+
+            var response = Client.Execute(request);
 
             Respuesta = response.Content;
 
@@ -216,7 +320,7 @@ namespace Frontend_BCPVentas.Controllers
 
             Asesor = oAsesor;
 
-            List<SelectListItem> items = Asesor.ConvertAll(d=>{
+            List<SelectListItem> items = Asesor.ConvertAll(d => {
                 return new SelectListItem()
                 {
                     Text = d.Name.ToString(),
@@ -224,7 +328,7 @@ namespace Frontend_BCPVentas.Controllers
                     Selected = false
                 };
             });
-            
+
             ViewBag.items = items;
 
             return View();
@@ -236,11 +340,30 @@ namespace Frontend_BCPVentas.Controllers
             int sumaPuntos;
             int Id_Asesor = Int32.Parse(IdAsesor);
 
-            RestClient Client = new RestClient("https://localhost:7094/api/Venta/" + Id_Asesor);
+            string UrlApi = "https://localhost:7094/api/";
             string Respuesta;
+            string Respuesta2;
 
-            RestRequest request = new RestRequest();
-            var response = Client.Get(request);
+            var options = new RestClientOptions()
+            {
+                Authenticator = new ApiAuthorization(UrlApi, new Login()
+                {
+                    Email = "carlitos.4007@gmail.com",
+                    Pwd = "123456"
+
+                })
+            };
+
+            var Client = new RestClient(options);
+
+            var request = new RestRequest()
+            {
+                Resource = UrlApi + "Venta/" + Id_Asesor,
+                Method = Method.Get
+            };
+
+            //RestRequest request = new RestRequest("Venta");
+            var response = Client.Execute(request);
 
             Respuesta = response.Content;
 
@@ -248,11 +371,16 @@ namespace Frontend_BCPVentas.Controllers
 
             ListaVentas = oVentasInformation;
 
-            RestClient Client2 = new RestClient("https://localhost:7094/api/Asesor");
-            string Respuesta2;
+            //Combo
+            var Client2 = new RestClient(options);
 
-            RestRequest request2 = new RestRequest();
-            var response2 = Client2.Get(request);
+            var request2 = new RestRequest()
+            {
+                Resource = UrlApi + "Asesor",
+                Method = Method.Get
+            };
+
+            var response2 = Client2.Execute(request2);
 
             Respuesta2 = response2.Content;
 
