@@ -1,8 +1,7 @@
 ﻿using Frontend_BCPVentas.Models;
-using Newtonsoft.Json;
+using FluentAssertions;
 using RestSharp;
 using RestSharp.Authenticators;
-using System;
 using static Frontend_BCPVentas.Models.Login;
 
 namespace Frontend_BCPVentas.Authorization
@@ -17,37 +16,18 @@ namespace Frontend_BCPVentas.Authorization
             _login = login;
         }
 
-        public Login login = new Login();
-        public Access access = new Access();
+        //public Login login = new Login();
+
         public string GetToken()
         {
-            string token;
-            login.Email = _login.Email;
-            login.Pwd = _login.Pwd;
+            using (var client = new RestClient(_url)) {
 
-            RestClient Login = new RestClient(_url);
-            string json = JsonConvert.SerializeObject(login);
+                var authResponse = client.PostJson<Login, Access>("Login", _login);
 
-            var request = new RestRequest("Login", Method.Get);
+                authResponse.Token.Should().NotBeNullOrEmpty();
 
-            request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("login", login.Email);
-            request.AddParameter("password", login.Pwd);
-
-            //request.RequestFormat = RestSharp.DataFormat.Json;
-            //request.AddBody(new Login
-            //{
-            //    Email = "carlitos.4007",
-            //    Pwd = "123456"
-            //});
-
-            var respuesta = Login.Execute(request);
-
-            string jwtToken = respuesta.Content;
-
-            var ojwtToken = JsonConvert.DeserializeObject<Access>(jwtToken);
-
-            return $"Bearer {ojwtToken.token}";
+                return $"Bearer {authResponse.Token}";
+          }
         }
 
         protected override ValueTask<Parameter> GetAuthenticationParameter(string accesToken)

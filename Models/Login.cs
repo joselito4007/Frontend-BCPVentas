@@ -1,4 +1,6 @@
-﻿namespace Frontend_BCPVentas.Models
+﻿using System.Text.Json.Serialization;
+
+namespace Frontend_BCPVentas.Models
 {
     public class Login
     {
@@ -6,7 +8,8 @@
         public string Pwd { get; set; }
         public class Access
         {
-            public string token { get; set; }
+            [JsonPropertyName("token")]
+            public string Token { get; set; }
         }
     }
 }
